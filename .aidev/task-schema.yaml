@@ -1,0 +1,298 @@
+# Task Schema Definition
+# 에이전트 간 협업을 위한 표준 Task 구조 정의
+
+Generated_Task:
+  # 필수 정보 섹션
+  id: 
+    type: string
+    pattern: "[A-Z_]+_[a-z0-9]+"
+    description: "고유한 Task 식별자 (예: USER_API_DEV_a7f3b2c9)"
+    required: true
+  
+  name: 
+    type: string
+    description: "Task의 간략한 이름"
+    required: true
+  
+  description: 
+    type: string
+    description: "Task의 상세한 설명"
+    required: true
+  
+  # 상태 관리 섹션
+  status: 
+    type: string
+    enum: ["대기중", "진행중", "완료", "실패", "수정필요", "보류"]
+    description: "현재 Task 상태"
+    default: "대기중"
+    required: true
+  
+  priority: 
+    type: string
+    enum: ["높음", "중간", "낮음", "긴급"]
+    description: "Task 우선순위"
+    default: "중간"
+    required: true
+  
+  # 할당 및 의존성 섹션
+  assignedAgent: 
+    type: string
+    description: "담당 에이전트 이름 (예: developer-agent)"
+    required: true
+  
+  dependencies: 
+    type: array
+    items: 
+      type: string
+      pattern: "[A-Z_]+_[a-z0-9]+"
+    description: "이 Task가 의존하는 다른 Task ID들"
+    default: []
+  
+  # 접근 권한 섹션
+  access:
+    type: object
+    properties:
+      files:
+        type: object
+        properties:
+          read:
+            type: array
+            items: 
+              type: string
+            description: "읽기 권한이 있는 파일/디렉토리 패턴"
+            default: []
+          write:
+            type: array
+            items: 
+              type: string
+            description: "쓰기 권한이 있는 파일 경로"
+            default: []
+          exclude:
+            type: array
+            items: 
+              type: string
+            description: "접근 금지된 파일/디렉토리"
+            default: []
+      commands:
+        type: object
+        properties:
+          allowed:
+            type: array
+            items: 
+              type: string
+            description: "허용된 명령어 목록"
+            default: []
+          restricted:
+            type: array
+            items: 
+              type: string
+            description: "제한된 명령어 목록"
+            default: []
+  
+  # 검증 기준 섹션
+  validation:
+    type: object
+    properties:
+      criteria:
+        type: array
+        items: 
+          type: string
+        description: "완료 기준 목록"
+        default: []
+      tests:
+        type: array
+        items: 
+          type: string
+        description: "실행할 테스트 명령어"
+        default: []
+      reviewers:
+        type: array
+        items: 
+          type: string
+        description: "검토할 에이전트 목록"
+        default: []
+  
+  # 선택적 메타데이터 섹션
+  metadata:
+    type: object
+    properties:
+      createdAt:
+        type: string
+        format: datetime
+        description: "Task 생성 시간"
+      createdBy:
+        type: string
+        description: "Task 생성 에이전트"
+      estimatedTime:
+        type: string
+        description: "예상 소요 시간 (예: 2h, 30m)"
+      tags:
+        type: array
+        items: 
+          type: string
+        description: "분류용 태그"
+        default: []
+      notes:
+        type: string
+        description: "추가 메모"
+  
+  # 실행 결과 섹션 (완료 후 추가)
+  execution:
+    type: object
+    properties:
+      startedAt:
+        type: string
+        format: datetime
+        description: "작업 시작 시간"
+      completedAt:
+        type: string
+        format: datetime
+        description: "작업 완료 시간"
+      results:
+        type: array
+        items: 
+          type: string
+        description: "작업 결과 목록"
+        default: []
+      files_modified:
+        type: array
+        items: 
+          type: string
+        description: "수정된 파일 목록"
+        default: []
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            description: "오류 유형"
+          message:
+            type: string
+            description: "오류 메시지"
+          details:
+            type: string
+            description: "상세 오류 내용"
+        description: "실패 시 오류 정보"
+  
+  # 검증 결과 섹션 (QA 완료 후 추가)
+  validation_result:
+    type: object
+    properties:
+      status:
+        type: string
+        enum: ["통과", "실패", "조건부통과"]
+        description: "검증 결과 상태"
+      testedAt:
+        type: string
+        format: datetime
+        description: "테스트 실행 시간"
+      test_results:
+        type: array
+        items:
+          type: object
+          properties:
+            test:
+              type: string
+              description: "실행한 테스트"
+            status:
+              type: string
+              enum: ["통과", "실패"]
+              description: "테스트 결과"
+            output:
+              type: string
+              description: "테스트 출력"
+        description: "개별 테스트 결과"
+        default: []
+      criteria_results:
+        type: array
+        items:
+          type: object
+          properties:
+            criteria:
+              type: string
+              description: "검증 기준"
+            status:
+              type: string
+              enum: ["충족", "미충족"]
+              description: "기준 충족 여부"
+            details:
+              type: string
+              description: "상세 내용"
+        description: "기준별 검증 결과"
+        default: []
+      failures:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+              description: "실패 유형"
+            test:
+              type: string
+              description: "실패한 테스트"
+            error:
+              type: string
+              description: "실패 오류 메시지"
+        description: "실패한 항목들"
+        default: []
+  
+  # 리뷰 결과 섹션 (여러 에이전트 검토 시)
+  review_results:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["통과", "실패", "조건부통과"]
+          description: "리뷰어별 검토 결과"
+        reviewed_by:
+          type: string
+          description: "검토 에이전트 이름"
+        reviewed_at:
+          type: string
+          format: datetime
+          description: "검토 시간"
+        issues:
+          type: array
+          items: 
+            type: string
+          description: "발견된 문제점"
+          default: []
+        recommendations:
+          type: array
+          items: 
+            type: string
+          description: "개선 권장사항"
+          default: []
+    description: "에이전트별 검토 결과"
+
+# 예시 Task 파일
+example:
+  Generated_Task:
+    id: "USER_API_DEV_a7f3b2c9"
+    name: "유저 서비스 API 개발"
+    description: "사용자 등록, 로그인, 프로필 조회 기능을 구현"
+    status: "대기중"
+    priority: "높음"
+    assignedAgent: "developer-agent"
+    dependencies: []
+    access:
+      files:
+        read: ["src/user/**", "src/auth/**", "requirements.txt"]
+        write: ["src/user/service.py", "src/user/models.py", "src/user/routes.py"]
+        exclude: [".env", "secrets/**"]
+      commands:
+        allowed: ["python", "pytest", "pip"]
+        restricted: ["docker", "kubectl", "sudo"]
+    validation:
+      criteria: ["코드 품질 확인", "테스트 커버리지 80% 이상", "API 문서 생성"]
+      tests: ["pytest tests/user/", "curl -X POST /api/user/register"]
+      reviewers: ["quality-assurance", "security-agent"]
+    metadata:
+      createdAt: "2024-01-20T09:00:00Z"
+      createdBy: "orchestrator"
+      estimatedTime: "4h"
+      tags: ["backend", "api", "user"]
+      notes: "Fast API 프레임워크 사용"

@@ -1,0 +1,53 @@
+Generated_Task:
+  id: "USER_API_DEV_a7f3b2c9"
+  name: "유저 서비스 API 개발"
+  description: "사용자 등록, 로그인, 프로필 조회 기능을 구현"
+  status: "대기중"
+  priority: "높음"
+  assignedAgent: "developer"
+  dependencies: []
+  
+  access:
+    files:
+      read: 
+        - "src/user/**"
+        - "src/auth/**" 
+        - "requirements.txt"
+      write: 
+        - "src/user/service.py"
+        - "src/user/models.py"
+        - "src/user/routes.py"
+      exclude: 
+        - ".env"
+        - "secrets/**"
+    commands:
+      allowed: 
+        - "python"
+        - "pytest" 
+        - "pip"
+      restricted: 
+        - "docker"
+        - "kubectl"
+        - "sudo"
+  
+  validation:
+    criteria:
+      - "코드 품질 확인"
+      - "테스트 커버리지 80% 이상"
+      - "API 문서 생성"
+    tests:
+      - "pytest tests/user/"
+      - "curl -X POST /api/user/register"
+    reviewers:
+      - "quality-assurance"
+      - "security-agent"
+  
+  metadata:
+    createdAt: "2024-01-20T09:00:00Z"
+    createdBy: "orchestrator"
+    estimatedTime: "4h"
+    tags:
+      - "backend"
+      - "api"
+      - "user"
+    notes: "FastAPI 프레임워크 사용"
