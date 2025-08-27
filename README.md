@@ -7,10 +7,13 @@
 ### 원클릭 설치 (추천)
 
 ```bash
-# 기본 프로젝트명으로 생성
+# 현재 폴더에 바로 설치 (추천)
+curl -fsSL https://raw.githubusercontent.com/kangthink/aidev-bootstrap/main/install-simple.sh | bash -s -- .
+
+# 기본 프로젝트명으로 새 폴더 생성
 curl -fsSL https://raw.githubusercontent.com/kangthink/aidev-bootstrap/main/install-simple.sh | bash
 
-# 커스텀 프로젝트명으로 생성
+# 커스텀 프로젝트명으로 새 폴더 생성
 curl -fsSL https://raw.githubusercontent.com/kangthink/aidev-bootstrap/main/install-simple.sh | bash -s -- my-ai-project
 ```
 
@@ -25,7 +28,7 @@ cd aidev-bootstrap
 ## 포함되는 폴더
 
 - `.claude/` - Claude Code 설정 및 워크플로우
-- `scripts/` - 개발 스크립트 및 유틸리티
+- `.aidev/` - AI 개발 스크립트 및 유틸리티
 
 ## 요구사항
 
@@ -35,10 +38,10 @@ cd aidev-bootstrap
 
 ## 커스터마이징
 
-`install-simple.sh`의 22번째 줄을 수정하여 복사할 폴더를 변경:
+`install-simple.sh`의 56번째 줄을 수정하여 복사할 폴더를 변경:
 
 ```bash
-for folder in .claude scripts; do
+for folder in .claude .aidev; do
     # 원하는 폴더명 추가
 ```
 
