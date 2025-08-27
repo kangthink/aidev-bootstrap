@@ -1,0 +1,10 @@
+{
+  "name": "AI Development Project",
+  "description": "Bootstrapped AI development environment",
+  "version": "1.0.0",
+  "claude_code": {
+    "enabled": true,
+    "auto_save": true,
+    "lint_on_save": true
+  }
+}
