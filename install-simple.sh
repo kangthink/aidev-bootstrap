@@ -9,47 +9,51 @@
 set -e
 
 REPO_URL="https://github.com/kangthink/aidev-bootstrap.git"
-PROJECT_NAME="${1:-ai-project-$(date +%s)}"
+PROJECT_ARG="${1:-}"
 TEMP_DIR="/tmp/aidev-bootstrap-$$"
-CURRENT_DIR_MODE=false
 
 echo "🚀 AI Development Bootstrap"
 
-# Check for current directory mode
-if [ "$PROJECT_NAME" = "." ]; then
-    CURRENT_DIR_MODE=true
+# Determine installation mode
+if [ "$PROJECT_ARG" = "." ]; then
+    # Current directory mode
     PROJECT_NAME=$(basename "$PWD")
+    TARGET_DIR="."
     echo "📦 Installing to current directory: $PROJECT_NAME"
     
-    # Check if current directory has files that might conflict
+    # Check for conflicts
     if [ -d ".claude" ] || [ -d ".aidev" ]; then
-        echo "⚠️  Warning: .claude or .aidev folder already exists in current directory"
+        echo "⚠️  Warning: .claude or .aidev folder already exists"
         read -p "Continue and overwrite? (y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             exit 1
         fi
     fi
-else
+elif [ -n "$PROJECT_ARG" ]; then
+    # Custom project name
+    PROJECT_NAME="$PROJECT_ARG"
+    TARGET_DIR="$PROJECT_NAME"
     echo "📦 Project: $PROJECT_NAME"
     
-    # Check if project directory exists
     if [ -d "$PROJECT_NAME" ]; then
         echo "❌ Directory '$PROJECT_NAME' already exists"
         exit 1
     fi
+else
+    # Default project name
+    PROJECT_NAME="ai-project-$(date +%s)"
+    TARGET_DIR="$PROJECT_NAME"
+    echo "📦 Project: $PROJECT_NAME"
 fi
 
 # Clone template to temp directory
 echo "📥 Downloading template..."
 git clone --depth 1 "$REPO_URL" "$TEMP_DIR" >/dev/null 2>&1
 
-# Create project directory (unless current dir mode)
-if [ "$CURRENT_DIR_MODE" = false ]; then
-    mkdir -p "$PROJECT_NAME"
-    TARGET_DIR="$PROJECT_NAME"
-else
-    TARGET_DIR="."
+# Create target directory if needed
+if [ "$TARGET_DIR" != "." ]; then
+    mkdir -p "$TARGET_DIR"
 fi
 
 # Copy specific folders (.claude, .aidev, etc.)
@@ -61,8 +65,8 @@ for folder in .claude .aidev; do
     fi
 done
 
-# Copy any other important files (only if not current dir mode to avoid overwriting)
-if [ "$CURRENT_DIR_MODE" = false ]; then
+# Copy important files only for new project mode
+if [ "$TARGET_DIR" != "." ]; then
     for file in .gitignore README.md; do
         if [ -f "$TEMP_DIR/$file" ]; then
             cp "$TEMP_DIR/$file" "$TARGET_DIR/"
@@ -73,11 +77,11 @@ fi
 # Cleanup
 rm -rf "$TEMP_DIR"
 
-# Initialize new git repository
+# Initialize git repository
 cd "$TARGET_DIR"
 
-if [ "$CURRENT_DIR_MODE" = true ]; then
-    # Check if already a git repository
+if [ "$TARGET_DIR" = "." ]; then
+    # Current directory mode - check if git repo exists
     if [ ! -d ".git" ]; then
         git init
         git add .
@@ -86,10 +90,11 @@ if [ "$CURRENT_DIR_MODE" = true ]; then
 Template: $REPO_URL"
         echo "✅ Git repository initialized"
     else
-        echo "ℹ️  Git repository already exists, skipping initialization"
-        echo "💡 You can manually commit the new files if needed"
+        echo "ℹ️  Existing git repository detected"
+        echo "💡 You can manually commit the new files: git add . && git commit -m 'Add AI dev tools'"
     fi
 else
+    # New project mode - always init new repo
     git init
     git add .
     git commit -m "Initial commit: bootstrapped AI project
@@ -101,7 +106,8 @@ echo ""
 echo "🎉 Success! Project '$PROJECT_NAME' is ready"
 echo "📍 $(pwd)"
 echo ""
-if [ "$CURRENT_DIR_MODE" = false ]; then
+
+if [ "$TARGET_DIR" != "." ]; then
     echo "Get started:"
     echo "  cd $PROJECT_NAME"
 else
