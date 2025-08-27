@@ -22,8 +22,8 @@ if [ "$PROJECT_NAME" = "." ]; then
     echo "📦 Installing to current directory: $PROJECT_NAME"
     
     # Check if current directory has files that might conflict
-    if [ -d ".claude" ] || [ -d "scripts" ]; then
-        echo "⚠️  Warning: .claude or scripts folder already exists in current directory"
+    if [ -d ".claude" ] || [ -d ".aidev" ]; then
+        echo "⚠️  Warning: .claude or .aidev folder already exists in current directory"
         read -p "Continue and overwrite? (y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
