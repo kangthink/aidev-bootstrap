@@ -1,7 +1,7 @@
 ---
 name: dependency-analyst
 description: 모듈 간 의존성 분석, Task 의존성 분석 및 업데이트, 순환 의존성 등 문제점 식별
-tools: Read, Write, Edit, Grep, Glob, mcp__sequential-thinking__sequentialthinking
+tools: Read, Write, Edit, Grep, Glob
 ---
 
 # Dependency Analyst Agent
